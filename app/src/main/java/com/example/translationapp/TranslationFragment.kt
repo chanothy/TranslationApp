@@ -1,10 +1,14 @@
 package com.example.translationapp
 
 import android.os.Bundle
+import android.text.Editable
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
+import android.text.TextWatcher;
+import android.util.Log
 import androidx.lifecycle.ViewModelProvider
 import com.example.translationapp.databinding.FragmentTranslationBinding
 
@@ -27,6 +31,7 @@ class TranslationFragment : Fragment() {
     lateinit var viewModel: TranslationMainViewModel
 
 
+
 //    override fun onCreate(savedInstanceState: Bundle?) {
 //        super.onCreate(savedInstanceState)
 //        arguments?.let {
@@ -46,6 +51,20 @@ class TranslationFragment : Fragment() {
         val view = binding.root
         viewModel = ViewModelProvider(this).get(TranslationMainViewModel::class.java)
         updateScreen()
+
+        var editText = binding.editText
+        editText.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+            }
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                viewModel.textToTranslate = binding.editText.toString()
+                Log.i("Translation Fragment", "viewModel.textToTranslate")
+            }
+
+            override fun afterTextChanged(s: Editable?) {
+            }
+        })
 
         return view
     }

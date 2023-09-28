@@ -2,6 +2,7 @@ package com.example.translationapp
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.widget.EditText
 import androidx.lifecycle.ViewModelProvider
 import com.example.translationapp.databinding.ActivityMainBinding
 
@@ -17,8 +18,12 @@ class MainActivity : AppCompatActivity() {
         viewModel = ViewModelProvider(this).get(TranslationMainViewModel::class.java)
         updateScreen()
 
+
+
         setContentView(view)
     }
+
+
 
     fun updateScreen() {
         binding.translationText.text = viewModel.translatedText
