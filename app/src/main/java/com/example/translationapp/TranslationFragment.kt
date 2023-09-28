@@ -44,12 +44,15 @@ class TranslationFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
-//        return inflater.inflate(R.layout.fragment_translation, container, false)
+
 
         _binding = FragmentTranslationBinding.inflate(inflater,container,false)
         val view = binding.root
-        viewModel = ViewModelProvider(this).get(TranslationMainViewModel::class.java)
+
+        /*
+        Keyword of requireActivity is important to connecting the activity and fragment liveData
+         */
+        viewModel = ViewModelProvider(requireActivity()).get(TranslationMainViewModel::class.java)
         updateScreen()
 
         var editText = binding.editText
@@ -58,11 +61,14 @@ class TranslationFragment : Fragment() {
             }
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                viewModel.textToTranslate = binding.editText.toString()
-                Log.i("Translation Fragment", "viewModel.textToTranslate")
+                viewModel.textToTranslate = binding.editText.text.toString()
+                viewModel.ttt.value = binding.editText.text.toString()
+                Log.d("YourTag", "EditText Value: ${viewModel.ttt.value}")
             }
 
             override fun afterTextChanged(s: Editable?) {
+
+
             }
         })
 

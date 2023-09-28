@@ -2,7 +2,9 @@ package com.example.translationapp
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.widget.EditText
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.example.translationapp.databinding.ActivityMainBinding
 
@@ -17,8 +19,10 @@ class MainActivity : AppCompatActivity() {
         val view = binding.root
         viewModel = ViewModelProvider(this).get(TranslationMainViewModel::class.java)
         updateScreen()
-
-
+        viewModel.ttt.observe(this, Observer {
+            Log.d("Test",it.toString())
+            binding.translationText.text = it.toString()
+        })
 
         setContentView(view)
     }
@@ -27,5 +31,6 @@ class MainActivity : AppCompatActivity() {
 
     fun updateScreen() {
         binding.translationText.text = viewModel.translatedText
+
     }
 }
