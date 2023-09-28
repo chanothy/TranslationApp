@@ -16,25 +16,25 @@
             android:layout_weight="1">
 
             <TextView
-                android:id="@+id/textView"
+                android:id="@+id/sourceTV"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/source_language" />
 
             <RadioButton
-                android:id="@+id/radioButton3"
+                android:id="@+id/englishSource"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/english" />
 
             <RadioButton
-                android:id="@+id/radioButton"
+                android:id="@+id/spanishSource"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/spanish" />
 
             <RadioButton
-                android:id="@+id/radioButton2"
+                android:id="@+id/germanSource"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -47,25 +47,25 @@
             android:layout_weight="1">
 
             <TextView
-                android:id="@+id/textView2"
+                android:id="@+id/translationTV"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/translation" />
 
             <RadioButton
-                android:id="@+id/radioButton4"
+                android:id="@+id/spanishTranslation"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/spanish" />
 
             <RadioButton
-                android:id="@+id/radioButton5"
+                android:id="@+id/germanTranslation"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/german" />
 
             <RadioButton
-                android:id="@+id/radioButton6"
+                android:id="@+id/englishTranslation"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/english" />
@@ -75,7 +75,7 @@
     </LinearLayout>
 
     <TextView
-        android:id="@+id/textView3"
+        android:id="@+id/translationText"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_weight="1"
