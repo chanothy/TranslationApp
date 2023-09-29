@@ -13,6 +13,17 @@ import com.example.translationapp.databinding.ActivityMainBinding
 
 
 class MainActivity : AppCompatActivity() {
+    /**
+     * TranslationApp MainActivity
+     * Allows for user input to choose translation methods.
+     *
+     * Contains radio buttons that choose store the live data regarding
+     * source and what to translate to. Contains observers that update the view
+     * when live data in the viewModel is changed.
+     *
+     * @author Timothy Chan
+     * @author Kenna Edwards
+     */
 
     private lateinit var binding: ActivityMainBinding
     lateinit var viewModel: TranslationMainViewModel
@@ -32,10 +43,18 @@ class MainActivity : AppCompatActivity() {
             binding.translationText.text = it.toString()
         })
 
+        /*
+        Takes into account what source option and does it.
+        This is constantly looking at the viewModel live data: selectedRadioButtonSource
+         */
         viewModel.selectedRadioButtonSource.observe(this, Observer {
             // todo
         })
 
+        /*
+        Takes into account what translation option and does it.
+        This is constantly looking at the viewModel live data: selectedRadioButtonTranslate
+         */
         viewModel.selectedRadioButtonTranslate.observe(this, Observer {
             // todo
         })
@@ -45,6 +64,7 @@ class MainActivity : AppCompatActivity() {
 
         /*
         These two listeners updates the radio group live data in the TranslationMainViewModel
+        The values it stores is the @id/ in the XML
          */
         radioGroupSource.setOnCheckedChangeListener { _, checkedId ->
             val resourceName = resources.getResourceEntryName(checkedId)

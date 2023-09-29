@@ -12,20 +12,19 @@ import android.util.Log
 import androidx.lifecycle.ViewModelProvider
 import com.example.translationapp.databinding.FragmentTranslationBinding
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [TranslationFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class TranslationFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
+    /**
+     * Translation fragment.
+     *
+     * Contains a single editText that connects to the viewModel
+     * and allows for input of textToTranslate. Updates the live data in the viewModel with input.
+     *
+     * @property _binding - binding for finding views
+     * @property viewModel - viewModel for storing live data
+     *
+     * @author Timothy Chan
+     */
+
     private var _binding: FragmentTranslationBinding? = null
     private val binding get() = _binding!!
     lateinit var viewModel: TranslationMainViewModel
@@ -34,6 +33,10 @@ class TranslationFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        /**
+         * Contains a listener that watches the editText and updates the live data reactively.
+         * Every input causes an update.
+         */
         // binding
         _binding = FragmentTranslationBinding.inflate(inflater,container,false)
         val view = binding.root
@@ -55,7 +58,6 @@ class TranslationFragment : Fragment() {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 viewModel.textToTranslate.value = binding.editText.text.toString()
             }
-
             override fun afterTextChanged(s: Editable?) {
             }
         })
