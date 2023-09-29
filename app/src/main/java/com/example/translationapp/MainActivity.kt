@@ -19,7 +19,7 @@ class MainActivity : AppCompatActivity() {
         val view = binding.root
         viewModel = ViewModelProvider(this).get(TranslationMainViewModel::class.java)
         updateScreen()
-        viewModel.ttt.observe(this, Observer {
+        viewModel.textToTranslate.observe(this, Observer {
             Log.d("Test",it.toString())
             binding.translationText.text = it.toString()
         })
