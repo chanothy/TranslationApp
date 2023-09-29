@@ -6,13 +6,19 @@ import androidx.lifecycle.ViewModel
 
 class TranslationMainViewModel : ViewModel() {
 
-
     val textToTranslate: MutableLiveData<String> by lazy {
         MutableLiveData<String>()
     }
 
-    var translatedText = ""
+    val selectedRadioButtonSource: MutableLiveData<String> by lazy {
+        MutableLiveData<String>()
+    }
 
-    var selectedRadioButtonSource = -1
-    var selectedRadioButtonTranslate = -1
+    val selectedRadioButtonTranslate: MutableLiveData<String> by lazy {
+        MutableLiveData<String>()
+    }
+
+//    var textToTranslate = ""
+//    var selectedRadioButtonSource = ""
+//    var selectedRadioButtonTranslate = ""
 }
