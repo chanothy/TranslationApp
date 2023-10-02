@@ -14,6 +14,7 @@ import com.google.mlkit.common.model.DownloadConditions
 import com.google.mlkit.nl.translate.TranslateLanguage
 import com.google.mlkit.nl.translate.Translation
 import com.google.mlkit.nl.translate.TranslatorOptions
+import kotlinx.coroutines.awaitAll
 
 
 class MainActivity : AppCompatActivity() {
@@ -40,7 +41,6 @@ class MainActivity : AppCompatActivity() {
         var sourceLang: String = "English"
         var translateLang: String = "Spanish"
 
-
         val option1 = TranslatorOptions.Builder()
             .setSourceLanguage(TranslateLanguage.ENGLISH)
             .setTargetLanguage(TranslateLanguage.SPANISH).build()
@@ -65,19 +65,24 @@ class MainActivity : AppCompatActivity() {
         observers for the Live data in TranslationMainViewModel
         when the liveData changes due to [function 1], the text changes at the same time
          */
+        var translated = ""
         viewModel.textToTranslate.observe(this, Observer {
-            translate(option1,it.toString())
             Log.d("viewModel.textToTranslate",it.toString())
-            Log.d("viewModel.textToTranslate",viewModel.finalText.value.toString())
-        })
 
-        /*
-        observer for the Live data in for finalText
-        finalText is just the translated text that is updated by the translate function.
-         */
-        // todo
-        viewModel.finalText.observe(this, Observer {
-            binding.translationText.text = viewModel.finalText.value.toString()
+            when {
+                sourceLang == "English" && translateLang == "Spanish" -> translated = translate(option1,it)
+                sourceLang == "English" && translateLang == "German" -> translated = translate(option2,it)
+                sourceLang == "Spanish" && translateLang == "German" -> translated = translate(option3,it)
+                sourceLang == "Spanish" && translateLang == "English" -> translated = translate(option4,it)
+                sourceLang == "German" && translateLang == "Spanish" -> translated = translate(option5,it)
+                sourceLang == "German" && translateLang == "English" -> translated = translate(option6,it)
+                else -> println("Invalid") //Maybe do a toast asking the user to pick a language?
+            }
+
+            println(translated + "Here is the returned value")
+//            binding.translationText.text = it.toString()
+
+            binding.translationText.text = translated
         })
 
         /*
@@ -85,13 +90,11 @@ class MainActivity : AppCompatActivity() {
         This is constantly looking at the viewModel live data: selectedRadioButtonSource
          */
         viewModel.selectedRadioButtonSource.observe(this, Observer {
-//            Log.d("Source lang",this.toString())
-            if (this.toString().uppercase().equals("English")) {
-                sourceLang = "English"
-            } else if (this.toString().uppercase().equals("Spanish")) {
-                sourceLang = "Spanish"
-            } else {
-                sourceLang = "German"
+            when (it){
+                "englishSource" -> sourceLang = "English"
+                "spanishSource" -> sourceLang = "Spanish"
+                "germanSource" -> sourceLang = "German"
+                else -> println("Invalid Language Source")
             }
 
         })
@@ -101,12 +104,12 @@ class MainActivity : AppCompatActivity() {
         This is constantly looking at the viewModel live data: selectedRadioButtonTranslate
          */
         viewModel.selectedRadioButtonTranslate.observe(this, Observer {
-            if (this.toString().uppercase().equals("English")) {
-                translateLang = "English"
-            } else if (this.toString().uppercase().equals("Spanish")) {
-                translateLang = "Spanish"
-            } else {
-                translateLang = "German"
+            println(it + "The target")
+            when (it){
+                "englishTranslation" -> translateLang = "English"
+                "spanishTranslation" -> translateLang = "Spanish"
+                "germanTranslation" -> translateLang = "German"
+                else -> println("Invalid Language Target")
             }
         })
 
@@ -132,38 +135,33 @@ class MainActivity : AppCompatActivity() {
         setContentView(view)
     }
 
-    // todo
-    fun translate(options:TranslatorOptions, textToTranslate:String) {
+    fun translate(options:TranslatorOptions, textToTranslate:String):String {
         val translator = Translation.getClient(options)
-        getLifecycle().addObserver(translator)
+        var translatedTextRet:String = ""
 
         var conditions = DownloadConditions.Builder()
             .requireWifi()
             .build()
         translator.downloadModelIfNeeded(conditions)
             .addOnSuccessListener {
-                // Model downloaded successfully. Okay to start translating.
-                // (Set a flag, unhide the translation UI, etc.)
-
-                translator.translate(textToTranslate)
-                    .addOnSuccessListener { translatedText ->
-                        viewModel.finalText.value = translatedText
-
-                        Log.i("MainActivity is translating", translatedText)
-                    // Translation successful.
-                    }
-                    .addOnFailureListener { exception ->
-                        Log.e("MainActivity", exception.toString())
-                        viewModel.finalText.value = ""
-                        // Error.
-                        // ...
-                    }
             }
             .addOnFailureListener { exception ->
                 Log.e("MainActivity", exception.toString())
-                viewModel.finalText.value = ""
                 // Model couldn’t be downloaded or other internal error.
-                // ...
             }
+
+        translator.translate(textToTranslate)
+            .addOnSuccessListener { translatedText ->
+                translatedTextRet= translatedText
+                Log.i("MainActivity is translating", translatedText)
+            }
+            .addOnFailureListener { exception ->
+                Log.e("MainActivity", exception.toString())
+                // Error.
+            }
+        println (translatedTextRet + "This is the translated text within the method")
+
+        lifecycle.addObserver(translator)
+        return "Hello"
     }
 }
