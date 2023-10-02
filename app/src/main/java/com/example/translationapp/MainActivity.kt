@@ -75,6 +75,7 @@ class MainActivity : AppCompatActivity() {
         observer for the Live data in for finalText
         finalText is just the translated text that is updated by the translate function.
          */
+        // todo
         viewModel.finalText.observe(this, Observer {
             binding.translationText.text = viewModel.finalText.value.toString()
         })
@@ -131,6 +132,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(view)
     }
 
+    // todo
     fun translate(options:TranslatorOptions, textToTranslate:String) {
         val translator = Translation.getClient(options)
         getLifecycle().addObserver(translator)
