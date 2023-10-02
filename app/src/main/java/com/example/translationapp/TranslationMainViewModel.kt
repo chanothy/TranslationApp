@@ -13,6 +13,10 @@ class TranslationMainViewModel : ViewModel() {
         MutableLiveData<String>()
     }
 
+    val finalText: MutableLiveData<String> by lazy {
+        MutableLiveData<String>()
+    }
+
     /*
     Sample ID stored would be englishSource. Comes from @id/ field in XML.
      */

@@ -40,6 +40,7 @@ class MainActivity : AppCompatActivity() {
         var sourceLang: String = "English"
         var translateLang: String = "Spanish"
 
+
         val option1 = TranslatorOptions.Builder()
             .setSourceLanguage(TranslateLanguage.ENGLISH)
             .setTargetLanguage(TranslateLanguage.SPANISH).build()
@@ -65,10 +66,17 @@ class MainActivity : AppCompatActivity() {
         when the liveData changes due to [function 1], the text changes at the same time
          */
         viewModel.textToTranslate.observe(this, Observer {
+            translate(option1,it.toString())
             Log.d("viewModel.textToTranslate",it.toString())
-            var translated = translate(option1,it)
-//            binding.translationText.text = it.toString()
-            binding.translationText.text = translated
+            Log.d("viewModel.textToTranslate",viewModel.finalText.value.toString())
+        })
+
+        /*
+        observer for the Live data in for finalText
+        finalText is just the translated text that is updated by the translate function.
+         */
+        viewModel.finalText.observe(this, Observer {
+            binding.translationText.text = viewModel.finalText.value.toString()
         })
 
         /*
@@ -76,6 +84,7 @@ class MainActivity : AppCompatActivity() {
         This is constantly looking at the viewModel live data: selectedRadioButtonSource
          */
         viewModel.selectedRadioButtonSource.observe(this, Observer {
+//            Log.d("Source lang",this.toString())
             if (this.toString().uppercase().equals("English")) {
                 sourceLang = "English"
             } else if (this.toString().uppercase().equals("Spanish")) {
@@ -122,9 +131,8 @@ class MainActivity : AppCompatActivity() {
         setContentView(view)
     }
 
-    fun translate(options:TranslatorOptions, textToTranslate:String):String {
+    fun translate(options:TranslatorOptions, textToTranslate:String) {
         val translator = Translation.getClient(options)
-        var translatedTextRet:String = ""
         getLifecycle().addObserver(translator)
 
         var conditions = DownloadConditions.Builder()
@@ -137,21 +145,23 @@ class MainActivity : AppCompatActivity() {
 
                 translator.translate(textToTranslate)
                     .addOnSuccessListener { translatedText ->
-                        translatedTextRet= translatedText
+                        viewModel.finalText.value = translatedText
+
                         Log.i("MainActivity is translating", translatedText)
                     // Translation successful.
                     }
                     .addOnFailureListener { exception ->
                         Log.e("MainActivity", exception.toString())
+                        viewModel.finalText.value = ""
                         // Error.
                         // ...
                     }
             }
             .addOnFailureListener { exception ->
                 Log.e("MainActivity", exception.toString())
+                viewModel.finalText.value = ""
                 // Model couldn’t be downloaded or other internal error.
                 // ...
             }
-        return translatedTextRet
     }
 }
