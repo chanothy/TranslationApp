@@ -66,8 +66,20 @@ class MainActivity : AppCompatActivity() {
          */
         viewModel.textToTranslate.observe(this, Observer {
             Log.d("viewModel.textToTranslate",it.toString())
-            var translated = translate(option1,it)
+            var translated = ""
+
+            when {
+                sourceLang == "English" && translateLang == "Spanish" -> translated = translate(option1,it)
+                sourceLang == "English" && translateLang == "German" -> translated = translate(option2,it)
+                sourceLang == "Spanish" && translateLang == "German" -> translated = translate(option3,it)
+                sourceLang == "Spanish" && translateLang == "English" -> translated = translate(option4,it)
+                sourceLang == "German" && translateLang == "Spanish" -> translated = translate(option5,it)
+                sourceLang == "German" && translateLang == "English" -> translated = translate(option6,it)
+                else -> println("Invalid") //Maybe do a toast asking the user to pick a language?
+            }
+
 //            binding.translationText.text = it.toString()
+
             binding.translationText.text = translated
         })
 
@@ -76,12 +88,11 @@ class MainActivity : AppCompatActivity() {
         This is constantly looking at the viewModel live data: selectedRadioButtonSource
          */
         viewModel.selectedRadioButtonSource.observe(this, Observer {
-            if (this.toString().uppercase().equals("English")) {
-                sourceLang = "English"
-            } else if (this.toString().uppercase().equals("Spanish")) {
-                sourceLang = "Spanish"
-            } else {
-                sourceLang = "German"
+            when (it){
+                "englishSource" -> sourceLang = "English"
+                "spanishSource" -> sourceLang = "Spanish"
+                "germanSource" -> sourceLang = "German"
+                else -> println("Invalid Language Source")
             }
 
         })
@@ -91,12 +102,12 @@ class MainActivity : AppCompatActivity() {
         This is constantly looking at the viewModel live data: selectedRadioButtonTranslate
          */
         viewModel.selectedRadioButtonTranslate.observe(this, Observer {
-            if (this.toString().uppercase().equals("English")) {
-                translateLang = "English"
-            } else if (this.toString().uppercase().equals("Spanish")) {
-                translateLang = "Spanish"
-            } else {
-                translateLang = "German"
+            println(it + "The target")
+            when (it){
+                "englishTranslation" -> translateLang = "English"
+                "spanishTranslation" -> translateLang = "Spanish"
+                "germanTranslation" -> translateLang = "German"
+                else -> println("Invalid Language Target")
             }
         })
 
