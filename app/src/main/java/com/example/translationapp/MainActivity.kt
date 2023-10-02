@@ -14,6 +14,7 @@ import com.google.mlkit.common.model.DownloadConditions
 import com.google.mlkit.nl.translate.TranslateLanguage
 import com.google.mlkit.nl.translate.Translation
 import com.google.mlkit.nl.translate.TranslatorOptions
+import kotlinx.coroutines.awaitAll
 
 
 class MainActivity : AppCompatActivity() {
@@ -64,9 +65,9 @@ class MainActivity : AppCompatActivity() {
         observers for the Live data in TranslationMainViewModel
         when the liveData changes due to [function 1], the text changes at the same time
          */
+        var translated = ""
         viewModel.textToTranslate.observe(this, Observer {
             Log.d("viewModel.textToTranslate",it.toString())
-            var translated = ""
 
             when {
                 sourceLang == "English" && translateLang == "Spanish" -> translated = translate(option1,it)
@@ -78,6 +79,7 @@ class MainActivity : AppCompatActivity() {
                 else -> println("Invalid") //Maybe do a toast asking the user to pick a language?
             }
 
+            println(translated + "Here is the returned value")
 //            binding.translationText.text = it.toString()
 
             binding.translationText.text = translated
@@ -136,33 +138,30 @@ class MainActivity : AppCompatActivity() {
     fun translate(options:TranslatorOptions, textToTranslate:String):String {
         val translator = Translation.getClient(options)
         var translatedTextRet:String = ""
-        getLifecycle().addObserver(translator)
 
         var conditions = DownloadConditions.Builder()
             .requireWifi()
             .build()
         translator.downloadModelIfNeeded(conditions)
             .addOnSuccessListener {
-                // Model downloaded successfully. Okay to start translating.
-                // (Set a flag, unhide the translation UI, etc.)
-
-                translator.translate(textToTranslate)
-                    .addOnSuccessListener { translatedText ->
-                        translatedTextRet= translatedText
-                        Log.i("MainActivity is translating", translatedText)
-                    // Translation successful.
-                    }
-                    .addOnFailureListener { exception ->
-                        Log.e("MainActivity", exception.toString())
-                        // Error.
-                        // ...
-                    }
             }
             .addOnFailureListener { exception ->
                 Log.e("MainActivity", exception.toString())
                 // Model couldn’t be downloaded or other internal error.
-                // ...
             }
-        return translatedTextRet
+
+        translator.translate(textToTranslate)
+            .addOnSuccessListener { translatedText ->
+                translatedTextRet= translatedText
+                Log.i("MainActivity is translating", translatedText)
+            }
+            .addOnFailureListener { exception ->
+                Log.e("MainActivity", exception.toString())
+                // Error.
+            }
+        println (translatedTextRet + "This is the translated text within the method")
+
+        lifecycle.addObserver(translator)
+        return "Hello"
     }
 }
