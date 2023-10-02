@@ -10,6 +10,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.example.translationapp.databinding.ActivityMainBinding
+import com.google.mlkit.common.model.DownloadConditions
+import com.google.mlkit.nl.translate.TranslateLanguage
+import com.google.mlkit.nl.translate.Translation
+import com.google.mlkit.nl.translate.TranslatorOptions
 
 
 class MainActivity : AppCompatActivity() {
@@ -33,6 +37,28 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         val view = binding.root
         viewModel = ViewModelProvider(this).get(TranslationMainViewModel::class.java)
+        var sourceLang: String = "English"
+        var translateLang: String = "Spanish"
+
+        val option1 = TranslatorOptions.Builder()
+            .setSourceLanguage(TranslateLanguage.ENGLISH)
+            .setTargetLanguage(TranslateLanguage.SPANISH).build()
+        val option2 = TranslatorOptions.Builder()
+            .setSourceLanguage(TranslateLanguage.ENGLISH)
+            .setTargetLanguage(TranslateLanguage.GERMAN).build()
+        val option3 = TranslatorOptions.Builder()
+            .setSourceLanguage(TranslateLanguage.SPANISH)
+            .setTargetLanguage(TranslateLanguage.GERMAN).build()
+        val option4 = TranslatorOptions.Builder()
+            .setSourceLanguage(TranslateLanguage.SPANISH)
+            .setTargetLanguage(TranslateLanguage.ENGLISH).build()
+        val option5 = TranslatorOptions.Builder()
+            .setSourceLanguage(TranslateLanguage.GERMAN)
+            .setTargetLanguage(TranslateLanguage.SPANISH).build()
+        val option6 = TranslatorOptions.Builder()
+            .setSourceLanguage(TranslateLanguage.GERMAN)
+            .setTargetLanguage(TranslateLanguage.ENGLISH).build()
+
 
         /*
         observers for the Live data in TranslationMainViewModel
@@ -40,7 +66,9 @@ class MainActivity : AppCompatActivity() {
          */
         viewModel.textToTranslate.observe(this, Observer {
             Log.d("viewModel.textToTranslate",it.toString())
-            binding.translationText.text = it.toString()
+            var translated = translate(option1,it)
+//            binding.translationText.text = it.toString()
+            binding.translationText.text = translated
         })
 
         /*
@@ -48,7 +76,14 @@ class MainActivity : AppCompatActivity() {
         This is constantly looking at the viewModel live data: selectedRadioButtonSource
          */
         viewModel.selectedRadioButtonSource.observe(this, Observer {
-            // todo
+            if (this.toString().uppercase().equals("English")) {
+                sourceLang = "English"
+            } else if (this.toString().uppercase().equals("Spanish")) {
+                sourceLang = "Spanish"
+            } else {
+                sourceLang = "German"
+            }
+
         })
 
         /*
@@ -56,7 +91,13 @@ class MainActivity : AppCompatActivity() {
         This is constantly looking at the viewModel live data: selectedRadioButtonTranslate
          */
         viewModel.selectedRadioButtonTranslate.observe(this, Observer {
-            // todo
+            if (this.toString().uppercase().equals("English")) {
+                translateLang = "English"
+            } else if (this.toString().uppercase().equals("Spanish")) {
+                translateLang = "Spanish"
+            } else {
+                translateLang = "German"
+            }
         })
 
         val radioGroupSource = binding.radioGroupSource
@@ -79,5 +120,38 @@ class MainActivity : AppCompatActivity() {
         }
 
         setContentView(view)
+    }
+
+    fun translate(options:TranslatorOptions, textToTranslate:String):String {
+        val translator = Translation.getClient(options)
+        var translatedTextRet:String = ""
+        getLifecycle().addObserver(translator)
+
+        var conditions = DownloadConditions.Builder()
+            .requireWifi()
+            .build()
+        translator.downloadModelIfNeeded(conditions)
+            .addOnSuccessListener {
+                // Model downloaded successfully. Okay to start translating.
+                // (Set a flag, unhide the translation UI, etc.)
+
+                translator.translate(textToTranslate)
+                    .addOnSuccessListener { translatedText ->
+                        translatedTextRet= translatedText
+                        Log.i("MainActivity is translating", translatedText)
+                    // Translation successful.
+                    }
+                    .addOnFailureListener { exception ->
+                        Log.e("MainActivity", exception.toString())
+                        // Error.
+                        // ...
+                    }
+            }
+            .addOnFailureListener { exception ->
+                Log.e("MainActivity", exception.toString())
+                // Model couldn’t be downloaded or other internal error.
+                // ...
+            }
+        return translatedTextRet
     }
 }
