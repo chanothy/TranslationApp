@@ -70,12 +70,12 @@ class MainActivity : AppCompatActivity() {
             Log.d("viewModel.textToTranslate",it.toString())
 
             when {
-                sourceLang == "English" && translateLang == "Spanish" -> translated = translate(option1,it)
-                sourceLang == "English" && translateLang == "German" -> translated = translate(option2,it)
-                sourceLang == "Spanish" && translateLang == "German" -> translated = translate(option3,it)
-                sourceLang == "Spanish" && translateLang == "English" -> translated = translate(option4,it)
-                sourceLang == "German" && translateLang == "Spanish" -> translated = translate(option5,it)
-                sourceLang == "German" && translateLang == "English" -> translated = translate(option6,it)
+                sourceLang == "English" && translateLang == "Spanish" -> translate(option1,it)
+                sourceLang == "English" && translateLang == "German" -> translate(option2,it)
+                sourceLang == "Spanish" && translateLang == "German" -> translate(option3,it)
+                sourceLang == "Spanish" && translateLang == "English" -> translate(option4,it)
+                sourceLang == "German" && translateLang == "Spanish" -> translate(option5,it)
+                sourceLang == "German" && translateLang == "English" -> translate(option6,it)
                 else -> println("Invalid") //Maybe do a toast asking the user to pick a language?
             }
 
@@ -135,33 +135,67 @@ class MainActivity : AppCompatActivity() {
         setContentView(view)
     }
 
-    fun translate(options:TranslatorOptions, textToTranslate:String):String {
+//    fun translate(options:TranslatorOptions, textToTranslate:String):String {
+//        val translator = Translation.getClient(options)
+//        var translatedTextRet:String = ""
+//
+//        var conditions = DownloadConditions.Builder()
+//            .requireWifi()
+//            .build()
+//        translator.downloadModelIfNeeded(conditions)
+//            .addOnSuccessListener {
+//            }
+//            .addOnFailureListener { exception ->
+//                Log.e("MainActivity", exception.toString())
+//                // Model couldn’t be downloaded or other internal error.
+//            }
+//
+//        translator.translate(textToTranslate)
+//            .addOnSuccessListener { translatedText ->
+//                translatedTextRet= translatedText
+//                Log.i("MainActivity is translating", translatedText)
+//            }
+//            .addOnFailureListener { exception ->
+//                Log.e("MainActivity", exception.toString())
+//                // Error.
+//            }
+//        println (translatedTextRet + "This is the translated text within the method")
+//
+//        lifecycle.addObserver(translator)
+//        return "Hello"
+//    }
+
+    fun translate(options:TranslatorOptions, textToTranslate:String) {
         val translator = Translation.getClient(options)
-        var translatedTextRet:String = ""
+        getLifecycle().addObserver(translator)
 
         var conditions = DownloadConditions.Builder()
             .requireWifi()
             .build()
         translator.downloadModelIfNeeded(conditions)
             .addOnSuccessListener {
+                // Model downloaded successfully. Okay to start translating.
+                // (Set a flag, unhide the translation UI, etc.)
+
+                translator.translate(textToTranslate)
+                    .addOnSuccessListener { translatedText ->
+                        viewModel.finalText.value = translatedText
+
+                        Log.i("MainActivity is translating", translatedText)
+                        // Translation successful.
+                    }
+                    .addOnFailureListener { exception ->
+                        Log.e("MainActivity", exception.toString())
+                        viewModel.finalText.value = ""
+                        // Error.
+                        // ...
+                    }
             }
             .addOnFailureListener { exception ->
                 Log.e("MainActivity", exception.toString())
+                viewModel.finalText.value = ""
                 // Model couldn’t be downloaded or other internal error.
+                // ...
             }
-
-        translator.translate(textToTranslate)
-            .addOnSuccessListener { translatedText ->
-                translatedTextRet= translatedText
-                Log.i("MainActivity is translating", translatedText)
-            }
-            .addOnFailureListener { exception ->
-                Log.e("MainActivity", exception.toString())
-                // Error.
-            }
-        println (translatedTextRet + "This is the translated text within the method")
-
-        lifecycle.addObserver(translator)
-        return "Hello"
     }
 }
