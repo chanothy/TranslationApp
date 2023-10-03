@@ -86,6 +86,15 @@ class MainActivity : AppCompatActivity() {
         })
 
         /*
+        observer for the Live data in for finalText
+        finalText is just the translated text that is updated by the translate function.
+         */
+        // todo
+        viewModel.finalText.observe(this, Observer {
+            binding.translationText.text = viewModel.finalText.value.toString()
+        })
+
+        /*
         Takes into account what source option and does it.
         This is constantly looking at the viewModel live data: selectedRadioButtonSource
          */
