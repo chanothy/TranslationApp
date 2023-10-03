@@ -7,27 +7,34 @@ Description of the project ...
 
 The following **required** functionality is completed:
 
-* [ ] User sees the WelcomeFragment first and can choose the following:
-* [ ]     Difficulty: easy, medium, and hard
-* [ ]     Operation: addition, subtraction, multiplication, and division
-* [ ]     Number of Questions: Greater than or equal to 1
-* [ ] User presses "start" button, and app navigates to the QuestionFragment
-* [ ] The user answers the number of questions they chose from the operator and difficulty.
-* [ ] When finished with each question, press done.
-* [ ] Once the amount of questions requested has been answered, the app navigates to the CorrectAnswersFragment
-* [ ] The user sees how many questions out of the total they got correct.
-* [ ] If desired, they can go back to the beginning of the app and quiz again, by pressing the "Do it again" button
+* [ ] User sees a screen with options to translate
+* [ ]     FROM: English, Spanish, German, or Detect Language (BONUS)
+* [ ]     TO: English, Spanish, or German
+* [ ] User chooses the appropriate radio buttons.
+* [ ] User can type any sentence and it will be appropriately translated.
+* [ ] User can change the language translating to while typing the sentence.
+* [ ] User can also change the source language while typing in the phrase.
+* [ ] Program uses view binding and view models.
 
 The following **extensions** are implemented:
-* androidx.fragment.app.Fragment
-* androidx.navigation.findNavController
 * androidx.appcompat.app.AppCompatActivity
+* androidx.fragment.app.Fragment
+* androidx.lifecycle.Observer
+* androidx.lifecycle.ViewModelProvider
+* androidx.lifecycle.LiveData
+* androidx.lifecycle.MutableLiveData
+* androidx.lifecycle.ViewModel
+* com.google.mlkit.common.model.DownloadConditions
+* com.google.mlkit.nl.languageid.LanguageIdentification
+* com.google.mlkit.nl.translate.TranslateLanguage
+* com.google.mlkit.nl.translate.Translation
+* com.google.mlkit.nl.translate.TranslatorOptions
 
 ## Video Walkthrough
 
 Here's a walkthrough of implemented user stories:
 
-<img src='https://github.com/kenna-edwards55/Project3New/blob/main/Project%203%20Demo.gif' title='Video Walkthrough' width='50%' alt='Video Walkthrough' />
+<img src='https://github.com/chanothy/TranslationApp/blob/master/Project5Demo.gif' title='Video Walkthrough' width='50%' alt='Video Walkthrough' />
 
 GIF created with [LiceCap](http://www.cockos.com/licecap/).
 
