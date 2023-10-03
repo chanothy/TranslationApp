@@ -11,6 +11,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.example.translationapp.databinding.ActivityMainBinding
 import com.google.mlkit.common.model.DownloadConditions
+import com.google.mlkit.nl.languageid.LanguageIdentification
 import com.google.mlkit.nl.translate.TranslateLanguage
 import com.google.mlkit.nl.translate.Translation
 import com.google.mlkit.nl.translate.TranslatorOptions
@@ -65,7 +66,7 @@ class MainActivity : AppCompatActivity() {
         observers for the Live data in TranslationMainViewModel
         when the liveData changes due to [function 1], the text changes at the same time
          */
-        var translated = ""
+//        var translated = ""
         viewModel.textToTranslate.observe(this, Observer {
             Log.d("viewModel.textToTranslate",it.toString())
 
@@ -79,7 +80,7 @@ class MainActivity : AppCompatActivity() {
                 else -> println("Invalid") //Maybe do a toast asking the user to pick a language?
             }
 
-            binding.translationText.text = translated
+//            binding.translationText.text = translated
         })
 
         /*
@@ -88,6 +89,19 @@ class MainActivity : AppCompatActivity() {
          */
         viewModel.finalText.observe(this, Observer {
             binding.translationText.text = viewModel.finalText.value.toString()
+        })
+
+        /*
+        observer for the Live data in for finalText
+        finalText is just the translated text that is updated by the translate function.
+         */
+
+        //todo finish auto detection of language
+        viewModel.detectedLanguage.observe(this, Observer {
+            val optionDetect = TranslatorOptions.Builder()
+                .setSourceLanguage(it)
+                .setTargetLanguage(translateLang).build()
+
         })
 
         /*
@@ -101,7 +115,6 @@ class MainActivity : AppCompatActivity() {
                 "germanSource" -> sourceLang = "German"
                 else -> println("Invalid Language Source")
             }
-
         })
 
         /*
@@ -137,6 +150,22 @@ class MainActivity : AppCompatActivity() {
         }
 
         setContentView(view)
+    }
+
+    fun detectLanguage(textToTranslate: String) {
+        val languageIdentifier = LanguageIdentification.getClient()
+        languageIdentifier.identifyPossibleLanguages(viewModel.textToTranslate.toString())
+            .addOnSuccessListener { identifiedLanguages ->
+                for (identifiedLanguage in identifiedLanguages) {
+                    val language = identifiedLanguage.languageTag
+                    val confidence = identifiedLanguage.confidence
+                    viewModel.detectedLanguage.value = language
+                    Log.i("MainActivity.kt", "$language $confidence")
+                }
+            }
+            .addOnFailureListener {
+                // Model couldn’t be loaded or other internal error.
+            }
     }
 
     fun translate(options:TranslatorOptions, textToTranslate:String) {

@@ -7,8 +7,15 @@ import androidx.lifecycle.ViewModel
 class TranslationMainViewModel : ViewModel() {
 
     /*
-    The data from the editText in TranslationFragment is sent here and then used by MainActivity
+    The translated text from translate in MainActivity is sent here and then used by MainActivity's translateText text view.
      */
+    val detectedLanguage: MutableLiveData<String> by lazy {
+        MutableLiveData<String>()
+    }
+
+    /*
+        The data from the editText in TranslationFragment is sent here and then used by MainActivity
+         */
     val textToTranslate: MutableLiveData<String> by lazy {
         MutableLiveData<String>()
     }
@@ -16,7 +23,6 @@ class TranslationMainViewModel : ViewModel() {
     /*
     The translated text from translate in MainActivity is sent here and then used by MainActivity's translateText text view.
      */
-    // todo
     val finalText: MutableLiveData<String> by lazy {
         MutableLiveData<String>()
     }
