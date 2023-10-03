@@ -39,27 +39,29 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         val view = binding.root
         viewModel = ViewModelProvider(this).get(TranslationMainViewModel::class.java)
-        var sourceLang: String = "English"
-        var translateLang: String = "Spanish"
+        var sourceLang: String = "en"
+        var translateLang: String = "es"
 
-        val option1 = TranslatorOptions.Builder()
-            .setSourceLanguage(TranslateLanguage.ENGLISH)
-            .setTargetLanguage(TranslateLanguage.SPANISH).build()
-        val option2 = TranslatorOptions.Builder()
-            .setSourceLanguage(TranslateLanguage.ENGLISH)
-            .setTargetLanguage(TranslateLanguage.GERMAN).build()
-        val option3 = TranslatorOptions.Builder()
-            .setSourceLanguage(TranslateLanguage.SPANISH)
-            .setTargetLanguage(TranslateLanguage.GERMAN).build()
-        val option4 = TranslatorOptions.Builder()
-            .setSourceLanguage(TranslateLanguage.SPANISH)
-            .setTargetLanguage(TranslateLanguage.ENGLISH).build()
-        val option5 = TranslatorOptions.Builder()
-            .setSourceLanguage(TranslateLanguage.GERMAN)
-            .setTargetLanguage(TranslateLanguage.SPANISH).build()
-        val option6 = TranslatorOptions.Builder()
-            .setSourceLanguage(TranslateLanguage.GERMAN)
-            .setTargetLanguage(TranslateLanguage.ENGLISH).build()
+//        TranslateLanguage.getAllLanguages()
+
+//        val option2 = TranslatorOptions.Builder()
+//            .setSourceLanguage(TranslateLanguage.ENGLISH)
+//            .setTargetLanguage(TranslateLanguage.GERMAN).build()
+//        val option3 = TranslatorOptions.Builder()
+//            .setSourceLanguage(TranslateLanguage.SPANISH)
+//            .setTargetLanguage(TranslateLanguage.GERMAN).build()
+//        val option4 = TranslatorOptions.Builder()
+//            .setSourceLanguage(TranslateLanguage.SPANISH)
+//            .setTargetLanguage(TranslateLanguage.ENGLISH).build()
+//        val option5 = TranslatorOptions.Builder()
+//            .setSourceLanguage(TranslateLanguage.GERMAN)
+//            .setTargetLanguage(TranslateLanguage.SPANISH).build()
+//        val option6 = TranslatorOptions.Builder()
+//            .setSourceLanguage(TranslateLanguage.GERMAN)
+//            .setTargetLanguage(TranslateLanguage.ENGLISH).build()
+//        var optionDetect = TranslatorOptions.Builder()
+//            .setSourceLanguage(sourceLang)
+//            .setTargetLanguage(translateLang).build()
 
 
         /*
@@ -69,16 +71,37 @@ class MainActivity : AppCompatActivity() {
 //        var translated = ""
         viewModel.textToTranslate.observe(this, Observer {
             Log.d("viewModel.textToTranslate",it.toString())
+            Log.d("MainActivity", sourceLang + translateLang)
 
-            when {
-                sourceLang == "English" && translateLang == "Spanish" -> translate(option1,it)
-                sourceLang == "English" && translateLang == "German" -> translate(option2,it)
-                sourceLang == "Spanish" && translateLang == "German" -> translate(option3,it)
-                sourceLang == "Spanish" && translateLang == "English" -> translate(option4,it)
-                sourceLang == "German" && translateLang == "Spanish" -> translate(option5,it)
-                sourceLang == "German" && translateLang == "English" -> translate(option6,it)
-                else -> println("Invalid") //Maybe do a toast asking the user to pick a language?
+            if (sourceLang == "detect") {
+                detectLanguage()
+                val option = TranslatorOptions.Builder()
+                    .setSourceLanguage(TranslateLanguage.fromLanguageTag(viewModel.detectedLanguage.value.toString()).toString())
+                    .setTargetLanguage(TranslateLanguage.fromLanguageTag(translateLang).toString()).build()
+                translate(option, it)
+            } else {
+                val option = TranslatorOptions.Builder()
+                    .setSourceLanguage(TranslateLanguage.fromLanguageTag(sourceLang).toString())
+                    .setTargetLanguage(TranslateLanguage.fromLanguageTag(translateLang).toString()).build()
+                translate(option, it)
             }
+
+
+
+
+//            when {
+//                sourceLang != "Detect" -> translate(option1,it)
+//                sourceLang == "Detect" -> translate(optionDetect, it)
+//                sourceLang == "English" && translateLang == "German" -> translate(option2,it)
+//                sourceLang == "Spanish" && translateLang == "German" -> translate(option3,it)
+//                sourceLang == "Spanish" && translateLang == "English" -> translate(option4,it)
+//                sourceLang == "German" && translateLang == "Spanish" -> translate(option5,it)
+//                sourceLang == "German" && translateLang == "English" -> translate(option6,it)
+//                sourceLang == "Detect" && translateLang == "English" -> {
+//                    detectLanguage(it)
+//                    translate(optionDetect,it)}
+//                else -> println("Invalid") //Maybe do a toast asking the user to pick a language?
+//            }
 
 //            binding.translationText.text = translated
         })
@@ -98,10 +121,7 @@ class MainActivity : AppCompatActivity() {
 
         //todo finish auto detection of language
         viewModel.detectedLanguage.observe(this, Observer {
-            val optionDetect = TranslatorOptions.Builder()
-                .setSourceLanguage(it)
-                .setTargetLanguage(translateLang).build()
-
+            sourceLang = it
         })
 
         /*
@@ -110,9 +130,10 @@ class MainActivity : AppCompatActivity() {
          */
         viewModel.selectedRadioButtonSource.observe(this, Observer {
             when (it){
-                "englishSource" -> sourceLang = "English"
-                "spanishSource" -> sourceLang = "Spanish"
-                "germanSource" -> sourceLang = "German"
+                "englishSource" -> sourceLang = "en"
+                "spanishSource" -> sourceLang = "es"
+                "germanSource" -> sourceLang = "de"
+                "detectSource" -> sourceLang = "detect"
                 else -> println("Invalid Language Source")
             }
         })
@@ -123,9 +144,9 @@ class MainActivity : AppCompatActivity() {
          */
         viewModel.selectedRadioButtonTranslate.observe(this, Observer {
             when (it){
-                "englishTranslation" -> translateLang = "English"
-                "spanishTranslation" -> translateLang = "Spanish"
-                "germanTranslation" -> translateLang = "German"
+                "englishTranslation" -> translateLang = "en"
+                "spanishTranslation" -> translateLang = "es"
+                "germanTranslation" -> translateLang = "de"
                 else -> println("Invalid Language Target")
             }
         })
@@ -152,20 +173,43 @@ class MainActivity : AppCompatActivity() {
         setContentView(view)
     }
 
-    fun detectLanguage(textToTranslate: String) {
+    fun detectLanguage(){
+
         val languageIdentifier = LanguageIdentification.getClient()
-        languageIdentifier.identifyPossibleLanguages(viewModel.textToTranslate.toString())
-            .addOnSuccessListener { identifiedLanguages ->
-                for (identifiedLanguage in identifiedLanguages) {
-                    val language = identifiedLanguage.languageTag
-                    val confidence = identifiedLanguage.confidence
-                    viewModel.detectedLanguage.value = language
-                    Log.i("MainActivity.kt", "$language $confidence")
+        languageIdentifier.identifyLanguage(viewModel.textToTranslate.value.toString())
+            .addOnSuccessListener { languageCode ->
+                if (languageCode == "und") {
+                    Log.i("Detecting Language", "Can't identify language.")
+                } else {
+                    viewModel.detectedLanguage.value = languageCode
+                    Log.i("Detecting Language", "Language: $languageCode" + viewModel.textToTranslate.value.toString())
                 }
             }
             .addOnFailureListener {
                 // Model couldn’t be loaded or other internal error.
+                // ...
             }
+//        var highestConfidence:Float = 0.0F
+//        val languageIdentifier = LanguageIdentification.getClient()
+//        languageIdentifier.identifyPossibleLanguages(viewModel.textToTranslate.toString())
+//            .addOnSuccessListener { identifiedLanguages ->
+//                for (identifiedLanguage in identifiedLanguages) {
+//                    val language = identifiedLanguage.languageTag
+//                    val confidence = identifiedLanguage.confidence
+//                    Log.d("Detect", language)
+//                    if (confidence > highestConfidence) {
+//                        highestConfidence = confidence
+//                        viewModel.detectedLanguage.value = language
+//
+//                    }
+//
+//                    Log.i("MainActivity.kt", "$language $confidence")
+//                }
+//            }
+//            .addOnFailureListener {
+//                // Model couldn’t be loaded or other internal error.
+//            }
+
     }
 
     fun translate(options:TranslatorOptions, textToTranslate:String) {
