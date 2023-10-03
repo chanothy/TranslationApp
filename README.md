@@ -41,19 +41,17 @@ GIF created with [LiceCap](http://www.cockos.com/licecap/).
 ## Notes
 
 Describe any challenges encountered while building the app.
-* A major challenge I faced was the plugins.  I did not correctly implement all of the plugins, which led to several hours of debugging the issue.
-* Another challenge was passing arguments between screens.  It was difficult to ensure the nav_graph.xml was correctly implemented.
-
-Functionality Note
-* For division, the user's answer is equal to the Integer. AKA if the question is 9/8, the answer is 1.
+* The biggest challenge was ensuring the viewModel text view was updating as the translating was happening.
+* Reason being, the ml kit works asynchronously, so the view model needed to update ~after~ the translating has completed.  We utilized MutableLiveData<String> updating to combat this problem
 
 Logic
-* The user chooses their difficulty level, which defines what operands will be displayed in the questions.
-* "easy" = 1 <= operand < 10
-* "medium" = 1 <= operand < 25
-* "hard" = 1 <= operand < 50
-
-* When the user submits an answer, the solve() function evaluates and returns the correct answer to the math problem.  An if statement in the "done" button evaluates whether the correct answer matches the users input.  If yes, the number of correct answers increases by 1.  For more details, see kDocs within QuestionFragment.kt
+* The user chooses their source and target language.
+* There is an textToTranslate observer:
+* IF: the "DetectLanguage" radio button was selected, the detectLanguage() method is called.  This will set the detectedLanguage viewModel variable to the detected language.
+* Then, it will translate the user's text input
+* ELSE: the user's text input will be immediately translated with the selected source and target languages.
+*
+* SEE Kdoc comments for more detail.
 
 ## License
 
