@@ -14,8 +14,8 @@ class TranslationMainViewModel : ViewModel() {
     }
 
     /*
-        The data from the editText in TranslationFragment is sent here and then used by MainActivity
-         */
+    The data from the editText in TranslationFragment is sent here and then used by MainActivity
+    */
     val textToTranslate: MutableLiveData<String> by lazy {
         MutableLiveData<String>()
     }

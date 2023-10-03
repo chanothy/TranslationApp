@@ -52,7 +52,7 @@ class MainActivity : AppCompatActivity() {
             Log.d("MainActivity", sourceLang + translateLang)
 
             if (sourceLang == "detect") {
-                detectLanguage(translateLang,it)
+                detectLanguage(it)
 
             } else {
                 val option = TranslatorOptions.Builder()
@@ -132,7 +132,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(view)
     }
 
-    fun detectLanguage(translateLang:String, translateThis:String){
+    fun detectLanguage(translateThis:String){
 
         val languageIdentifier = LanguageIdentification.getClient()
         languageIdentifier.identifyLanguage(translateThis)
