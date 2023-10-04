@@ -1,11 +1,7 @@
 package com.example.translationapp
 
-import android.R
 import android.os.Bundle
 import android.util.Log
-import android.view.View
-import android.widget.RadioButton
-import android.widget.RadioGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -15,7 +11,6 @@ import com.google.mlkit.nl.languageid.LanguageIdentification
 import com.google.mlkit.nl.translate.TranslateLanguage
 import com.google.mlkit.nl.translate.Translation
 import com.google.mlkit.nl.translate.TranslatorOptions
-import kotlinx.coroutines.awaitAll
 
 
 class MainActivity : AppCompatActivity() {
@@ -27,6 +22,9 @@ class MainActivity : AppCompatActivity() {
      * source and what to translate to. Contains observers that update the view
      * when live data in the viewModel is changed.
      *
+     * @property binding - binding for finding views
+     * @property viewModel - viewModel for storing live data
+     *
      * @author Timothy Chan
      * @author Kenna Edwards
      */
@@ -36,20 +34,45 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         binding = ActivityMainBinding.inflate(layoutInflater)
-        val view = binding.root
         viewModel = ViewModelProvider(this).get(TranslationMainViewModel::class.java)
+        val view = binding.root
+
+        /**
+         * [sourceLang]: String- represents the source language for the translation.
+         *      Default value= "en" AKA English.
+         *      Changes in the radioGroupSource.
+         * [translateLang]: String- represents the target language for the translation.
+         *      Default value= "es" AKA Spanish.
+         *      Changes in the radioGroupTranslate.
+         */
         var sourceLang: String = "en"
         var translateLang: String = "es"
 
-        /*
-        observers for the Live data in TranslationMainViewModel
-        when the liveData changes due to [function 1], the text changes at the same time
+        /**
+         * [radioGroupSource]: RadioGroup- contains source language radio buttons in activity_main.xml
+         * [radioGroupTranslate]: RadioGroup- contains translate -> language radio buttons in activity_main.xml
          */
+        val radioGroupSource = binding.radioGroupSource
+        val radioGroupTranslate = binding.radioGroupTranslate
+
 
         viewModel.textToTranslate.observe(this, Observer {
-            Log.d("viewModel.textToTranslate",it.toString())
-            Log.d("MainActivity", sourceLang + translateLang)
+            /**
+             *  @parameter [it]: a String- the user's text input that needs to be translated
+             *
+             * A View Model Observer for the Live data variable [textToTranslate] defined in TranslationMainViewModel.kt.
+             *
+             * When the liveData changes due to the [editText.addTextChangedListener] in TranslationFragment.kt
+             * the text changes at the same time.
+             *
+             * IF [sourceLang] = "detect", AKA the user wants the program to auto-detect the source language,
+             *   detectLanguage() is called, and the value of [viewModel.textToTranslate] is sent as the param.
+             * ELSE translate() is called, and a TranslationOptions object [option] with the chosen
+             *   [sourceLang] and [translateLang] is sent as the first param,
+             *   and the value of [viewModel.textToTranslate] is sent as the second param.
+             */
 
             if (sourceLang == "detect") {
                 detectLanguage(it)
@@ -63,32 +86,52 @@ class MainActivity : AppCompatActivity() {
 
         })
 
-        /*
-        observer for the Live data in for finalText
-        finalText is just the translated text that is updated by the translate function.
-         */
         viewModel.finalText.observe(this, Observer {
+            /**
+             *  @parameter [it]: a String- the value of the translated text
+             *
+             * A View Model Observer for the Live data variable [finalText] defined in TranslationMainViewModel.kt.
+             *
+             * [binding.translationText]: TextView- the text view that displays the translated text to the user.
+             *   Defined in activity_main.xml. It is assigned the value of [finalText]
+             * [finalText]: String- The ~translated~ text that is updated by the translate().
+             */
+
             binding.translationText.text = viewModel.finalText.value.toString()
         })
 
-        /*
-        observer for the Live data in for finalText
-        finalText is just the translated text that is updated by the translate function.
-         */
-
         viewModel.detectedLanguage.observe(this, Observer {
+            /**
+             *  @parameter [it]: a String- the detected language to be used for translation
+             *
+             * A View Model Observer for the Live data variable [detectedLanguage] defined in TranslationMainViewModel.kt.
+             *
+             * When the user selects the "Detect Language" radio button from [selectedRadioButtonSource],
+             * [textToTranslate] calls [detectLanguage()], which updates this variable.
+             *
+             * translate() is called, and
+             * a TranslationOptions object [option] with the [detectedLanguage.value] AKA [it]
+             * and [translateLang] is sent as the first param,
+             * and the value of [viewModel.textToTranslate] is sent as the second param.
+             *
+             */
+
             val option = TranslatorOptions.Builder()
                 .setSourceLanguage(TranslateLanguage.fromLanguageTag(it).toString())
                 .setTargetLanguage(TranslateLanguage.fromLanguageTag(translateLang).toString()).build()
             translate(option, viewModel.textToTranslate.value.toString())
         })
 
-        /*
-        Takes into account what source option and does it.
-        This is constantly looking at the viewModel live data: selectedRadioButtonSource
-         */
         viewModel.selectedRadioButtonSource.observe(this, Observer {
-            when (it){
+            /**
+             *  @parameter [it]: a String- the @id/ for the selected radio button
+             * A View Model Observer for the Live data variable [selectedRadioButtonSource] defined in TranslationMainViewModel.kt.
+             * This is updated according to the activity of [radioGroupSource] in activity_main.kt
+             *
+             * Assigns the appropriate value to [sourceLang]
+             */
+
+            when (it) {
                 "englishSource" -> sourceLang = "en"
                 "spanishSource" -> sourceLang = "es"
                 "germanSource" -> sourceLang = "de"
@@ -97,11 +140,16 @@ class MainActivity : AppCompatActivity() {
             }
         })
 
-        /*
-        Takes into account what translation option and does it.
-        This is constantly looking at the viewModel live data: selectedRadioButtonTranslate
-         */
         viewModel.selectedRadioButtonTranslate.observe(this, Observer {
+            /**
+             * @parameter [it]: a String- the @id/ for the selected radio button
+             *
+             * A View Model Observer for the Live data variable [selectedRadioButtonTranslate] defined in TranslationMainViewModel.kt.
+             * This is updated according to the activity of [radioGroupTranslate] in activity_main.kt
+             *
+             * Assigns the appropriate value to [translateLang]
+             */
+
             when (it){
                 "englishTranslation" -> translateLang = "en"
                 "spanishTranslation" -> translateLang = "es"
@@ -110,47 +158,71 @@ class MainActivity : AppCompatActivity() {
             }
         })
 
-        val radioGroupSource = binding.radioGroupSource
-        val radioGroupTranslate = binding.radioGroupTranslate
-
-        /*
-        These two listeners updates the radio group live data in the TranslationMainViewModel
-        The values it stores is the @id/ in the XML
-         */
         radioGroupSource.setOnCheckedChangeListener { _, checkedId ->
+            /**
+             * Listener updates the radio group's selectedRadioButtonSource: MutableLiveData<String> value in TranslationMainViewModel.kt
+             * @parameter [checkedId]: An Int- The values it stores is the @id/ from activity_main.xml
+             */
+
             val resourceName = resources.getResourceEntryName(checkedId)
             viewModel.selectedRadioButtonSource.value = resourceName
             Log.i("SelectedRadioButtonID source", viewModel.selectedRadioButtonSource.value.toString())
         }
 
         radioGroupTranslate.setOnCheckedChangeListener { _, checkedId ->
+            /**
+             * Listener updates the radio group's selectedRadioButtonTranslate: MutableLiveData<String> value in TranslationMainViewModel.kt
+             * @parameter [checkedId]: An Int- The values it stores is the @id/ from activity_main.xml
+             */
+
             val resourceName = resources.getResourceEntryName(checkedId)
             viewModel.selectedRadioButtonTranslate.value = resourceName
             Log.i("SelectedRadioButtonID translate", viewModel.selectedRadioButtonTranslate.value.toString())
         }
-
         setContentView(view)
     }
 
-    fun detectLanguage(translateThis:String){
+    fun detectLanguage(translateThis:String) {
+        /**
+         * @parameter [translateThis]: String- The user's text input, which is used to detect the language
+         *
+         * Function utilizes the MLKit API to detect the (most probable) language associated with the input string.
+         *
+         * IF [languageCode] = "und", the text does not correlate closely enough with any language.
+         * ELSE [viewModel.detectedLanguage] is set to the [languageCode],
+         *  which will activate the [viewModel.detectedLanguage] observer.
+         *  This will call translate with the designated source language determined in this function.
+         */
 
         val languageIdentifier = LanguageIdentification.getClient()
         languageIdentifier.identifyLanguage(translateThis)
             .addOnSuccessListener { languageCode ->
                 if (languageCode == "und") {
-                    Log.i("Detecting Language", "Can't identify language." + translateThis)
+                    Log.e("MainActivity.kt", "Can't identify language from: " + translateThis)
                 } else {
                     viewModel.detectedLanguage.value = languageCode
 
-                    Log.i("Detecting Language", "Language: $languageCode" + translateThis)
+                    Log.i("MainActivity.kt", "Language detected: $languageCode" + " from " + translateThis)
                 }
             }
             .addOnFailureListener {
-                // Model couldn’t be loaded or other internal error.
+                Log.e("MainActivity.kt", "Detect a language failed.")
             }
     }
 
     fun translate(options:TranslatorOptions, textToTranslate:String) {
+        /**
+         * @parameter [options]: TranslatorOptions object- defines the source and target languages for the translation
+         * @parameter [textToTranslate]: String- user's input string to be translated
+         *
+         * Function utilizes the MLKit API to translate the given text, using the [options], from the source to the target language.
+         * Once the model needed for the given [options] is downloaded, the translator translates the [textToTranslate].
+         *
+         * IF the translation is successful,
+         *  Then, [viewModel.finalText] is assigned to the [translatedText].
+         *  This will trigger the [viewModel.finalText] observer, which will update the [binding.translationText] text view.
+         * ELSE [viewModel.finalText] = "" AKA the [binding.translationText] text view will not have translated text.
+         */
         val translator = Translation.getClient(options)
         getLifecycle().addObserver(translator)
 
@@ -159,25 +231,22 @@ class MainActivity : AppCompatActivity() {
             .build()
         translator.downloadModelIfNeeded(conditions)
             .addOnSuccessListener {
-                // Model downloaded successfully. Okay to start translating.
-
+                // Model downloaded successfully.
                 translator.translate(textToTranslate)
                     .addOnSuccessListener { translatedText ->
                         viewModel.finalText.value = translatedText
 
-                        Log.i("MainActivity is translating", translatedText)
+                        Log.i("MainActivity.kt", "translated to: " + translatedText)
                         // Translation successful.
                     }
                     .addOnFailureListener { exception ->
-                        Log.e("MainActivity", exception.toString())
+                        Log.e("MainActivity.kt", exception.toString())
                         viewModel.finalText.value = ""
-                        // Error.
                     }
             }
             .addOnFailureListener { exception ->
-                Log.e("MainActivity", exception.toString())
+                Log.e("MainActivity.kt", exception.toString())
                 viewModel.finalText.value = ""
-                // Model couldn’t be downloaded or other internal error.
             }
     }
 }
