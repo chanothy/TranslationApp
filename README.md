@@ -42,7 +42,7 @@ GIF created with [LiceCap](http://www.cockos.com/licecap/).
 
 Describe any challenges encountered while building the app.
 * The biggest challenge was ensuring the viewModel text view was updating as the translating was happening.
-* Reason being, the ml kit works asynchronously, so the view model needed to update ~after~ the translating has completed.  We utilized MutableLiveData<String> updating to combat this problem
+* Reason being, the ml kit works asynchronously, so the view model needed to update <ins>after<ins> the translating has completed.  We utilized MutableLiveData<String> updating to combat this problem
 
 Logic
 * The user chooses their source and target language.
