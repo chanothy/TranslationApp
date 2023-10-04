@@ -22,6 +22,7 @@ class TranslationFragment : Fragment() {
      * @property viewModel - viewModel for storing live data
      *
      * @author Timothy Chan
+     * @author Kenna Edwards
      */
 
     private var _binding: FragmentTranslationBinding? = null

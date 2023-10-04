@@ -4,6 +4,14 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 
 class TranslationMainViewModel : ViewModel() {
+    /**
+     * Translation View Model.
+     *
+     * Defines all mutable data variables.
+     *
+     * @author Timothy Chan
+     * @author Kenna Edwards
+     */
 
     /**
     The detected language of the user's text input from detectLanguage() in MainActivity is sent here and then used by MainActivity's translateText text view.
